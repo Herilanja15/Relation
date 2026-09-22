@@ -6,7 +6,7 @@ public class Relation {
 
     private ArrayList<Attribut> attributs;
 
-    private ArrayList<ArrayList<Integer>> donnees;
+    private ArrayList<ArrayList<String>> donnees;
 
     public Relation(String nom) {
         this.nom = nom;
@@ -18,112 +18,119 @@ public class Relation {
         return nom;
     }
 
-    // =========================
+    public ArrayList<Attribut> getAttributs() {
+        return attributs;
+    }
+
+
     // AJOUTER UN ATTRIBUT
-    // =========================
+    
 
     public void ajouterAttribut(Attribut attribut) {
 
-        attributs.add(attribut);
-
-        // Le domaine connaît cette relation
-        attribut.getDomaine().ajouterRelation(this);
-    }
-
-    // =========================
-    // CREATE / INSERT
-    // =========================
-
-    public void insert(int... valeurs) {
-
-        if (valeurs.length != attributs.size()) {
-            System.out.println(
-                "Erreur : nombre de valeurs incorrect."
-            );
+        if (attribut == null) {
+            System.out.println("Attribut invalide.");
             return;
         }
 
-        ArrayList<Integer> ligne = new ArrayList<>();
+        attributs.add(attribut);
+        attribut.getDomaine().ajouterRelation(this);
+    }
 
-        for (int valeur : valeurs) {
+    public boolean supprimerAttribut(String nomAttribut) {
+
+        for (Attribut attribut : attributs) {
+            if (attribut.getNom().equals(nomAttribut)) {
+                attributs.remove(attribut);
+                System.out.println("Attribut '" + nomAttribut + "' supprimé.");
+                return true;
+            }
+        }
+
+        System.out.println("Attribut introuvable.");
+        return false;
+    }
+
+  
+    // CREATE / INSERT
+    
+
+    public void insert(String... valeurs) {
+
+        if (valeurs.length != attributs.size()) {
+            System.out.println("Erreur : nombre de valeurs incorrect.");
+            return;
+        }
+
+        ArrayList<String> ligne = new ArrayList<>();
+
+        for (String valeur : valeurs) {
             ligne.add(valeur);
         }
 
         donnees.add(ligne);
-
         System.out.println("Ligne insérée avec succès.");
     }
 
-    // =========================
-    // READ / SELECT
-    // =========================
+    
+    // READ et SELECT
+   
 
     public void select() {
 
+        if (donnees.isEmpty()) {
+            System.out.println("Aucune donnée dans cette relation.");
+            return;
+        }
+
         afficherEntete();
 
-        for (ArrayList<Integer> ligne : donnees) {
-
-            for (Integer valeur : ligne) {
-                System.out.printf("%5d", valeur);
+        for (ArrayList<String> ligne : donnees) {
+            for (String valeur : ligne) {
+                System.out.printf("%5s", valeur);
             }
-
             System.out.println();
         }
     }
 
-    // =========================
+    
     // UPDATE
-    // =========================
+    
 
-    public void update(
-        int ligneIndex,
-        int colonneIndex,
-        int nouvelleValeur
-    ) {
+    public void update(int ligneIndex, int colonneIndex, String nouvelleValeur) {
 
-        if (ligneIndex < 0 ||
-            ligneIndex >= donnees.size()) {
-
+        if (ligneIndex < 0 || ligneIndex >= donnees.size()) {
             System.out.println("Ligne inexistante.");
             return;
         }
 
-        if (colonneIndex < 0 ||
-            colonneIndex >= attributs.size()) {
-
+        if (colonneIndex < 0 || colonneIndex >= attributs.size()) {
             System.out.println("Colonne inexistante.");
             return;
         }
 
-        donnees
-            .get(ligneIndex)
-            .set(colonneIndex, nouvelleValeur);
-
+        donnees.get(ligneIndex).set(colonneIndex, nouvelleValeur);
         System.out.println("Ligne modifiée avec succès.");
     }
 
-    // =========================
+    
     // DELETE
-    // =========================
+    
 
     public void delete(int ligneIndex) {
 
-        if (ligneIndex < 0 ||
-            ligneIndex >= donnees.size()) {
-
+        if (ligneIndex < 0 || ligneIndex >= donnees.size()) {
             System.out.println("Ligne inexistante.");
             return;
         }
 
         donnees.remove(ligneIndex);
-
         System.out.println("Ligne supprimée avec succès.");
     }
 
-    // =========================
+    
     // AFFICHAGE
-    // =========================
+    
 
     private void afficherEntete() {
 
@@ -134,20 +141,23 @@ public class Relation {
         }
 
         System.out.println();
-
         System.out.println("-------------------");
     }
 
-    // =========================
+    
     // AFFICHER STRUCTURE
-    // =========================
+    
 
     public void afficherStructure() {
 
         System.out.println("\nRelation : " + nom);
 
-        for (Attribut attribut : attributs) {
+        if (attributs.isEmpty()) {
+            System.out.println("Aucun attribut dans cette relation.");
+            return;
+        }
 
+        for (Attribut attribut : attributs) {
             System.out.println(
                 "- " +
                 attribut.getNom() +
